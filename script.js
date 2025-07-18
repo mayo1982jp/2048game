@@ -478,22 +478,9 @@ HTMLActuator.prototype.addTile = function (tile) {
   const inner = document.createElement("div"); // This is the element that will show the number
 
   // Calculate tile size and position dynamically
-  const containerWidth = this.tileContainer.offsetWidth;
-  const gapStyle = window.getComputedStyle(this.gridContainer).gap;
-  const gap = parseFloat(gapStyle) || 15; // Fallback if gap is not found or not a number
-
-  const gridSize = this.grid ? this.grid.size : 4; // Use grid size from game if available, else default to 4
-
-  let tileSize = (containerWidth - gap * (gridSize + 1)) / gridSize;
-
-  if (tileSize <= 0) {
-      const gridCellElement = document.querySelector('.grid-container .grid-cell');
-      if (gridCellElement) {
-          tileSize = gridCellElement.offsetWidth;
-      } else {
-           tileSize = 50;
-      }
-  }
+  const gridCellElement = document.querySelector('.grid-container .grid-cell');
+  const tileSize = gridCellElement ? gridCellElement.offsetWidth : 100; // Fallback to 100px
+  const gap = 15; // Assuming fixed gap from CSS
 
   wrapper.style.width = tileSize + "px";
   wrapper.style.height = tileSize + "px";
