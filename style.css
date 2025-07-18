@@ -66,6 +66,32 @@ body {
     margin-bottom: 2px;
 }
 
+.score-container {
+    position: relative;
+}
+
+.score-addition {
+    position: absolute;
+    right: 0;
+    top: -25px; /* Position above the score */
+    font-size: 20px;
+    font-weight: bold;
+    color: #776e65;
+    animation: move-up 0.6s ease-out;
+    opacity: 0; /* Start transparent, animation will fade it in and out */
+}
+
+@keyframes move-up {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-50px); /* Move up */
+        opacity: 0;
+    }
+}
+
 /* Above Game Area */
 .above-game {
     display: flex;
@@ -167,6 +193,14 @@ body {
 .tile.tile-super { background: #3c3a32; color: #f9f6f2; font-size: 20px; } /* For tiles > 2048 */
 
 /* Tile Merging Animation Placeholder Style */
+.tile-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
 .tile.merged {
     animation: pop 0.2s ease 0.05s; /* Pop slightly delayed after merge */
 }

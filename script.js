@@ -1,8 +1,11 @@
-window.requestAnimationFrame(() => {
-  new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
-});
+(function () {
+  'use strict';
 
-function GameManager(size, InputManager, Actuator, StorageManager) {
+  window.requestAnimationFrame(() => {
+    new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+  });
+
+  function GameManager(size, InputManager, Actuator, StorageManager) {
   this.size = size; // Size of the grid
   this.inputManager = new InputManager;
   this.storageManager = new StorageManager;
@@ -37,7 +40,7 @@ GameManager.prototype.isGameTerminated = function () {
 
 // Set up the game
 GameManager.prototype.setup = function () {
-  var previousState = this.storageManager.getGameState();
+  const previousState = this.storageManager.getGameState();
 
   if (previousState) {
     this.grid = new Grid(previousState.grid.size, previousState.grid.cells); // Reload grid
@@ -62,7 +65,7 @@ GameManager.prototype.setup = function () {
 
 // Set up the initial tiles to start the game with
 GameManager.prototype.addStartTiles = function () {
-  for (var i = 0; i < this.startTiles; i++) {
+  for (let i = 0; i < this.startTiles; i++) {
     this.addRandomTile();
   }
 };
@@ -70,8 +73,8 @@ GameManager.prototype.addStartTiles = function () {
 // Adds a tile in a random position
 GameManager.prototype.addRandomTile = function () {
   if (this.grid.cellsAvailable()) {
-    var value = Math.random() < 0.9 ? 2 : 4;
-    var tile = new Tile(this.grid.randomAvailableCell(), value);
+    const value = Math.random() < 0.9 ? 2 : 4;
+    const tile = new Tile(this.grid.randomAvailableCell(), value);
 
     this.grid.insertTile(tile);
   }
@@ -129,15 +132,15 @@ GameManager.prototype.moveTile = function (tile, cell) {
 
 // Move tiles on the grid in the specified direction
 GameManager.prototype.move = function (direction) {
-  var self = this;
+  const self = this;
 
   if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
-  var cell, tile;
+  let cell, tile;
 
-  var vector = this.getVector(direction);
-  var traversals = this.buildTraversals(vector);
-  var moved = false;
+  const vector = this.getVector(direction);
+  const traversals = this.buildTraversals(vector);
+  let moved = false;
 
   // Save the current tile positions and remove merger information
   this.prepareTiles();
@@ -149,12 +152,12 @@ GameManager.prototype.move = function (direction) {
       tile = self.grid.cellContent(cell);
 
       if (tile) {
-        var positions = self.findFarthestPosition(cell, vector);
-        var next = self.grid.cellContent(positions.next);
+        const positions = self.findFarthestPosition(cell, vector);
+        const next = self.grid.cellContent(positions.next);
 
         // Only one merger per row traversal?
         if (next && next.value === tile.value && !next.mergedFrom) {
-          var merged = new Tile(positions.next, tile.value * 2);
+          const merged = new Tile(positions.next, tile.value * 2);
           merged.mergedFrom = [tile, next];
 
           self.grid.insertTile(merged);
@@ -193,7 +196,7 @@ GameManager.prototype.move = function (direction) {
 // Get the vector representing the chosen direction
 GameManager.prototype.getVector = function (direction) {
   // Vectors representing tile movement
-  var map = {
+  const map = {
     0: { x: 0, y: -1 }, // Up
     1: { x: 1, y: 0 },  // Right
     2: { x: 0, y: 1 },  // Down
@@ -205,9 +208,9 @@ GameManager.prototype.getVector = function (direction) {
 
 // Build a list of positions to traverse in the right order
 GameManager.prototype.buildTraversals = function (vector) {
-  var traversals = { x: [], y: [] };
+  const traversals = { x: [], y: [] };
 
-  for (var pos = 0; pos < this.size; pos++) {
+  for (let pos = 0; pos < this.size; pos++) {
     traversals.x.push(pos);
     traversals.y.push(pos);
   }
@@ -220,7 +223,7 @@ GameManager.prototype.buildTraversals = function (vector) {
 };
 
 GameManager.prototype.findFarthestPosition = function (cell, vector) {
-  var previous;
+  let previous;
 
   // Progress towards the vector direction until an obstacle is found
   do {
@@ -241,20 +244,20 @@ GameManager.prototype.movesAvailable = function () {
 
 // Check for available matches between tiles (more expensive check)
 GameManager.prototype.tileMatchesAvailable = function () {
-  var self = this;
+  const self = this;
 
-  var tile;
+  let tile;
 
-  for (var x = 0; x < this.size; x++) {
-    for (var y = 0; y < this.size; y++) {
+  for (let x = 0; x < this.size; x++) {
+    for (let y = 0; y < this.size; y++) {
       tile = this.grid.cellContent({ x: x, y: y });
 
       if (tile) {
-        for (var direction = 0; direction < 4; direction++) {
-          var vector = self.getVector(direction);
-          var cell = { x: x + vector.x, y: y + vector.y };
+        for (let direction = 0; direction < 4; direction++) {
+          const vector = self.getVector(direction);
+          const cell = { x: x + vector.x, y: y + vector.y };
 
-          var other = self.grid.cellContent(cell);
+          const other = self.grid.cellContent(cell);
 
           if (other && other.value === tile.value) {
             return true; // These two tiles can be merged
@@ -279,12 +282,12 @@ function Grid(size, previousState) {
 
 // Build a grid of the specified size
 Grid.prototype.empty = function () {
-  var cells = [];
+  const cells = [];
 
-  for (var x = 0; x < this.size; x++) {
-    var row = cells[x] = [];
+  for (let x = 0; x < this.size; x++) {
+    const row = cells[x] = [];
 
-    for (var y = 0; y < this.size; y++) {
+    for (let y = 0; y < this.size; y++) {
       row.push(null);
     }
   }
@@ -293,13 +296,13 @@ Grid.prototype.empty = function () {
 };
 
 Grid.prototype.fromState = function (state) {
-  var cells = [];
+  const cells = [];
 
-  for (var x = 0; x < this.size; x++) {
-    var row = cells[x] = [];
+  for (let x = 0; x < this.size; x++) {
+    const row = cells[x] = [];
 
-    for (var y = 0; y < this.size; y++) {
-      var tile = state[x][y];
+    for (let y = 0; y < this.size; y++) {
+      const tile = state[x][y];
       row.push(tile ? new Tile(tile.position, tile.value) : null);
     }
   }
@@ -309,7 +312,7 @@ Grid.prototype.fromState = function (state) {
 
 // Find the first available random position
 Grid.prototype.randomAvailableCell = function () {
-  var cells = this.availableCells();
+  const cells = this.availableCells();
 
   if (cells.length) {
     return cells[Math.floor(Math.random() * cells.length)];
@@ -317,7 +320,7 @@ Grid.prototype.randomAvailableCell = function () {
 };
 
 Grid.prototype.availableCells = function () {
-  var cells = [];
+  const cells = [];
 
   this.eachCell(function (x, y, tile) {
     if (!tile) {
@@ -330,8 +333,8 @@ Grid.prototype.availableCells = function () {
 
 // Call callback for every cell
 Grid.prototype.eachCell = function (callback) {
-  for (var x = 0; x < this.size; x++) {
-    for (var y = 0; y < this.size; y++) {
+  for (let x = 0; x < this.size; x++) {
+    for (let y = 0; y < this.size; y++) {
       callback(x, y, this.cells[x][y]);
     }
   }
@@ -374,12 +377,12 @@ Grid.prototype.withinBounds = function (position) {
 };
 
 Grid.prototype.serialize = function () {
-  var cellState = [];
+  const cellState = [];
 
-  for (var x = 0; x < this.size; x++) {
-    var row = cellState[x] = [];
+  for (let x = 0; x < this.size; x++) {
+    const row = cellState[x] = [];
 
-    for (var y = 0; y < this.size; y++) {
+    for (let y = 0; y < this.size; y++) {
       row.push(this.cells[x][y] ? this.cells[x][y].serialize() : null);
     }
   }
@@ -430,7 +433,7 @@ function HTMLActuator() {
 }
 
 HTMLActuator.prototype.actuate = function (grid, metadata) {
-  var self = this;
+  const self = this;
 
   window.requestAnimationFrame(function () {
     self.clearContainer(self.tileContainer);
@@ -469,22 +472,22 @@ HTMLActuator.prototype.clearContainer = function (container) {
 };
 
 HTMLActuator.prototype.addTile = function (tile) {
-  var self = this;
+  const self = this;
 
-  var wrapper = document.createElement("div");
-  var inner = document.createElement("div"); // This is the element that will show the number
+  const wrapper = document.createElement("div");
+  const inner = document.createElement("div"); // This is the element that will show the number
 
   // Calculate tile size and position dynamically
-  var containerWidth = this.tileContainer.offsetWidth;
-  var gapStyle = window.getComputedStyle(this.gridContainer).gap;
-  var gap = parseFloat(gapStyle) || 15; // Fallback if gap is not found or not a number
+  const containerWidth = this.tileContainer.offsetWidth;
+  const gapStyle = window.getComputedStyle(this.gridContainer).gap;
+  const gap = parseFloat(gapStyle) || 15; // Fallback if gap is not found or not a number
 
-  var gridSize = this.grid ? this.grid.size : 4; // Use grid size from game if available, else default to 4
+  const gridSize = this.grid ? this.grid.size : 4; // Use grid size from game if available, else default to 4
 
-  var tileSize = (containerWidth - gap * (gridSize + 1)) / gridSize;
+  let tileSize = (containerWidth - gap * (gridSize + 1)) / gridSize;
 
   if (tileSize <= 0) {
-      var gridCellElement = document.querySelector('.grid-container .grid-cell');
+      const gridCellElement = document.querySelector('.grid-container .grid-cell');
       if (gridCellElement) {
           tileSize = gridCellElement.offsetWidth;
       } else {
@@ -495,11 +498,11 @@ HTMLActuator.prototype.addTile = function (tile) {
   wrapper.style.width = tileSize + "px";
   wrapper.style.height = tileSize + "px";
 
-  var currentPos = tile.previousPosition || { x: tile.x, y: tile.y };
+  const currentPos = tile.previousPosition || { x: tile.x, y: tile.y };
   wrapper.style.left = (currentPos.x * (tileSize + gap) + gap) + "px";
   wrapper.style.top = (currentPos.y * (tileSize + gap) + gap) + "px";
 
-  var classes = ["tile", "tile-" + tile.value];
+  const classes = ["tile", "tile-" + tile.value];
   if (tile.value > 2048) classes.push("tile-super");
 
   this.applyClasses(wrapper, classes);
@@ -524,7 +527,7 @@ HTMLActuator.prototype.addTile = function (tile) {
   if (tile.mergedFrom) {
       wrapper.classList.add("tile-merged");
       tile.mergedFrom.forEach(function (merged) {
-          var tempMergedTile = new Tile(merged.previousPosition || merged.position, merged.value);
+          const tempMergedTile = new Tile(merged.previousPosition || merged.position, merged.value);
           self.addTile(tempMergedTile);
       });
   }
@@ -549,13 +552,13 @@ HTMLActuator.prototype.positionClass = function (position) {
 HTMLActuator.prototype.updateScore = function (score) {
   this.clearContainer(this.scoreContainer);
 
-  var difference = score - this.score;
+  const difference = score - this.score;
   this.score = score;
 
   this.scoreContainer.textContent = this.score;
 
   if (difference > 0) {
-    var addition = document.createElement("div");
+    const addition = document.createElement("div");
     addition.classList.add("score-addition");
     addition.textContent = "+" + difference;
     // Note: CSS for .score-addition needs to be defined for this to be visible.
@@ -569,8 +572,8 @@ HTMLActuator.prototype.updateBestScore = function (bestScore) {
 };
 
 HTMLActuator.prototype.message = function (won) {
-  var type = won ? "game-won" : "game-over";
-  var messageText = won ? "You win!" : "Game over!";
+  const type = won ? "game-won" : "game-over";
+  let messageText = won ? "You win!" : "Game over!";
 
   if (document.documentElement.lang === "ja") {
     messageText = won ? "クリア！" : "ゲームオーバー";
@@ -622,9 +625,9 @@ KeyboardInputManager.prototype.emit = function (event, data) {
 };
 
 KeyboardInputManager.prototype.listen = function () {
-  var self = this;
+  const self = this;
 
-  var map = {
+  const map = {
     38: 0, // Up
     39: 1, // Right
     40: 2, // Down
@@ -640,9 +643,9 @@ KeyboardInputManager.prototype.listen = function () {
   };
 
   document.addEventListener("keydown", function (event) {
-    var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
+    const modifiers = event.altKey || event.ctrlKey || event.metaKey ||
       event.shiftKey;
-    var mapped = map[event.which];
+    const mapped = map[event.which];
 
     if (!modifiers) {
       if (mapped !== undefined) {
@@ -660,14 +663,14 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".restart-button", this.restart);
   // Assuming a .keep-playing-button might exist or be added later for the "Keep Playing" feature.
   // If not, this won't cause an error due to the check in bindButtonPress.
-  var keepPlayingButton = document.querySelector('.keep-playing-button');
+  const keepPlayingButton = document.querySelector('.keep-playing-button');
   if (keepPlayingButton) { // Only bind if the button exists in HTML
       this.bindButtonPress(".keep-playing-button", this.keepPlaying);
   }
 
 
-  var touchStartClientX, touchStartClientY;
-  var gameContainer = document.querySelector(".game-container"); // Changed from getElementsByClassName
+  let touchStartClientX, touchStartClientY;
+  const gameContainer = document.querySelector(".game-container"); // Changed from getElementsByClassName
 
   gameContainer.addEventListener(this.eventTouchstart, function (event) {
     if ((!window.navigator.msPointerEnabled && event.touches.length > 1) ||
@@ -696,7 +699,7 @@ KeyboardInputManager.prototype.listen = function () {
         return;
     }
 
-    var touchEndClientX, touchEndClientY;
+    let touchEndClientX, touchEndClientY;
 
     if (window.navigator.msPointerEnabled) {
       touchEndClientX = event.pageX;
@@ -706,11 +709,11 @@ KeyboardInputManager.prototype.listen = function () {
       touchEndClientY = event.changedTouches[0].clientY;
     }
 
-    var dx = touchEndClientX - touchStartClientX;
-    var absDx = Math.abs(dx);
+    const dx = touchEndClientX - touchStartClientX;
+    const absDx = Math.abs(dx);
 
-    var dy = touchEndClientY - touchStartClientY;
-    var absDy = Math.abs(dy);
+    const dy = touchEndClientY - touchStartClientY;
+    const absDy = Math.abs(dy);
 
     if (Math.max(absDx, absDy) > 10) { // Swipe detected
       self.emit("move", absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
@@ -729,7 +732,7 @@ KeyboardInputManager.prototype.keepPlaying = function (event) {
 };
 
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
-  var button = document.querySelector(selector);
+  const button = document.querySelector(selector);
   if (button) {
     button.addEventListener("click", fn.bind(this));
     // Adding touchend for mobile responsiveness, prevent double tap issues if any.
@@ -749,9 +752,9 @@ function LocalStorageManager() {
 }
 
 LocalStorageManager.prototype.localStorageSupported = function () {
-  var testKey = "test";
+  const testKey = "test";
   try {
-    var storage = window.localStorage;
+    const storage = window.localStorage;
     storage.setItem(testKey, "1");
     storage.removeItem(testKey);
     return true;
@@ -762,7 +765,7 @@ LocalStorageManager.prototype.localStorageSupported = function () {
 
 LocalStorageManager.prototype.getFakeStorage = function () {
   // Basic fake storage for environments where localStorage is not available
-  var fakeStorage = {};
+  const fakeStorage = {};
   return {
     getItem: function (key) {
       return fakeStorage[key] || null;
@@ -788,7 +791,7 @@ LocalStorageManager.prototype.setBestScore = function (score) {
 
 // Game state getters/setters
 LocalStorageManager.prototype.getGameState = function () {
-  var stateJSON = this.storage.getItem(this.gameStateKey);
+  const stateJSON = this.storage.getItem(this.gameStateKey);
   return stateJSON ? JSON.parse(stateJSON) : null;
 };
 
@@ -802,9 +805,9 @@ LocalStorageManager.prototype.clearGameState = function () {
 
 // Polyfill for window.requestAnimationFrame
 (function() {
-    var lastTime = 0;
-    var vendors = ['ms', 'moz', 'webkit', 'o'];
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+    let lastTime = 0;
+    const vendors = ['ms', 'moz', 'webkit', 'o'];
+    for(let x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
         window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
         window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
                                    || window[vendors[x]+'CancelRequestAnimationFrame'];
@@ -812,9 +815,9 @@ LocalStorageManager.prototype.clearGameState = function () {
 
     if (!window.requestAnimationFrame)
         window.requestAnimationFrame = function(callback, element) {
-            var currTime = new Date().getTime();
-            var timeToCall = Math.max(0, 16 - (currTime - lastTime)); // Aim for 60 FPS
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+            const currTime = new Date().getTime();
+            const timeToCall = Math.max(0, 16 - (currTime - lastTime)); // Aim for 60 FPS
+            const id = window.setTimeout(function() { callback(currTime + timeToCall); },
               timeToCall);
             lastTime = currTime + timeToCall;
             return id;
@@ -833,74 +836,6 @@ LocalStorageManager.prototype.clearGameState = function () {
 // However, the original script places script tag at the end of body,
 // so DOM elements are available. The requestAnimationFrame wrapper is fine.
 
-// Minor correction in HTMLActuator's addTile for merged tiles animation:
-// Ensure previousPosition is used for mergedFrom tiles if available,
-// otherwise their base position.
-HTMLActuator.prototype.addTile = function (tile) {
-    var self = this;
-
-    var wrapper = document.createElement("div");
-    var inner = document.createElement("div");
-
-    var containerWidth = this.tileContainer.offsetWidth;
-    var gapStyle = window.getComputedStyle(this.gridContainer).gap;
-    var gap = parseFloat(gapStyle) || 15;
-
-    var gridSize = this.grid && this.grid.size ? this.grid.size : 4;
-
-    var tileSize = (containerWidth - gap * (gridSize + 1)) / gridSize;
-
-    if (tileSize <= 0) {
-        var gridCellElement = this.gridContainer.querySelector('.grid-cell'); // Use pre-fetched gridContainer
-        if (gridCellElement) {
-            tileSize = gridCellElement.offsetWidth;
-        } else {
-             tileSize = 50;
-        }
-    }
-
-    wrapper.style.width = tileSize + "px";
-    wrapper.style.height = tileSize + "px";
-
-    var currentPos = tile.previousPosition || { x: tile.x, y: tile.y };
-    wrapper.style.left = (currentPos.x * (tileSize + gap) + gap) + "px";
-    wrapper.style.top = (currentPos.y * (tileSize + gap) + gap) + "px";
-
-    var classes = ["tile", "tile-" + tile.value];
-    if (tile.value > 2048) classes.push("tile-super");
-
-    this.applyClasses(wrapper, classes);
-
-    inner.classList.add("tile-inner");
-    inner.textContent = tile.value;
-    wrapper.appendChild(inner);
-
-    this.tileContainer.appendChild(wrapper);
-
-    if (tile.previousPosition && (tile.previousPosition.x !== tile.x || tile.previousPosition.y !== tile.y)) {
-        window.requestAnimationFrame(function () {
-            wrapper.style.left = (tile.x * (tileSize + gap) + gap) + "px";
-            wrapper.style.top = (tile.y * (tileSize + gap) + gap) + "px";
-        });
-    }
-
-
-    if (!tile.previousPosition && !tile.mergedFrom) { // A new tile
-        wrapper.classList.add("tile-new");
-    }
-
-    if (tile.mergedFrom) { // A merged tile
-        wrapper.classList.add("tile-merged");
-        tile.mergedFrom.forEach(function (merged) {
-            // Use the merged tile's *final* position for the temporary animation tile,
-            // as it represents a tile that was at that spot and is now part of the merge.
-            var tempMergedTile = new Tile({x: tile.x, y: tile.y}, merged.value);
-            // Set its previousPosition to where it came from for animation effect
-            tempMergedTile.previousPosition = merged.previousPosition || {x: merged.x, y: merged.y};
-
-            // Call addTile recursively for these temporary visual elements.
-            // They will appear, then be cleared in the next actuate cycle.
-            self.addTile(tempMergedTile);
-        });
-    }
-};
+// The second definition of addTile is removed as it's redundant.
+// The first definition is kept as the single source of truth.
+})();
