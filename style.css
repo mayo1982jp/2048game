@@ -164,7 +164,7 @@ body {
     font-weight: bold;
     border-radius: 3px;
     font-size: 45px; /* Default font size, will adjust per tile value */
-    transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out, color 0.1s ease-in-out, font-size 0.1s ease-in-out;
+    transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out, color 0.1s ease-in-out, font-size 0.1s ease-in-out, left 0.15s ease-in-out, top 0.15s ease-in-out;
     /* Basic animation for appearance/movement */
     animation: appear 0.2s ease;
 }
@@ -205,10 +205,30 @@ body {
     animation: pop 0.2s ease 0.05s; /* Pop slightly delayed after merge */
 }
 
+.tile.tile-new {
+    animation: appear 0.2s ease;
+}
+
 @keyframes pop {
     0% { transform: scale(1); }
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
+}
+
+@keyframes appear {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* タイル移動時のスムーズなアニメーション */
+.tile {
+    will-change: left, top, transform;
 }
 
 /* Game Message (Game Over / Win) */
