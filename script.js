@@ -480,14 +480,15 @@ HTMLActuator.prototype.addTile = function (tile) {
   // Calculate tile size and position dynamically
   const gridCellElement = document.querySelector('.grid-container .grid-cell');
   const tileSize = gridCellElement ? gridCellElement.offsetWidth : 100; // Fallback to 100px
-  const gap = 15; // Assuming fixed gap from CSS
+  const padding = 15; // tile-container padding
+  const gap = 15; // grid gap
 
   wrapper.style.width = tileSize + "px";
   wrapper.style.height = tileSize + "px";
 
   const currentPos = tile.previousPosition || { x: tile.x, y: tile.y };
-  wrapper.style.left = (currentPos.x * (tileSize + gap) + gap) + "px";
-  wrapper.style.top = (currentPos.y * (tileSize + gap) + gap) + "px";
+  wrapper.style.left = (currentPos.x * (tileSize + gap) + padding) + "px";
+  wrapper.style.top = (currentPos.y * (tileSize + gap) + padding) + "px";
 
   const classes = ["tile", "tile-" + tile.value];
   if (tile.value > 2048) classes.push("tile-super");
@@ -502,8 +503,8 @@ HTMLActuator.prototype.addTile = function (tile) {
 
   if (tile.previousPosition) {
       window.requestAnimationFrame(function () {
-          wrapper.style.left = (tile.x * (tileSize + gap) + gap) + "px";
-          wrapper.style.top = (tile.y * (tileSize + gap) + gap) + "px";
+          wrapper.style.left = (tile.x * (tileSize + gap) + padding) + "px";
+          wrapper.style.top = (tile.y * (tileSize + gap) + padding) + "px";
       });
   }
 
