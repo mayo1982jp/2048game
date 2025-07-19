@@ -158,7 +158,11 @@ GameManager.prototype.move = function (direction) {
         // Only one merger per row traversal?
         if (next && next.value === tile.value && !next.mergedFrom) {
           const merged = new Tile(positions.next, tile.value * 2);
-          merged.mergedFrom = [tile, next];
+          // 合体元のタイルの情報を正確に保存
+          merged.mergedFrom = [
+            { position: tile.position, previousPosition: tile.previousPosition, value: tile.value },
+            { position: next.position, previousPosition: next.previousPosition, value: next.value }
+          ];
 
           self.grid.insertTile(merged);
           self.grid.removeTile(tile);
@@ -502,10 +506,11 @@ HTMLActuator.prototype.addTile = function (tile) {
   this.tileContainer.appendChild(wrapper);
 
   if (tile.previousPosition) {
-      window.requestAnimationFrame(function () {
+      // アニメーションのために少し遅延を入れる
+      setTimeout(function () {
           wrapper.style.left = (tile.x * (tileSize + gap) + padding) + "px";
           wrapper.style.top = (tile.y * (tileSize + gap) + padding) + "px";
-      });
+      }, 16); // 約1フレーム分の遅延
   }
 
   if (!tile.previousPosition && !tile.mergedFrom) {
@@ -514,9 +519,37 @@ HTMLActuator.prototype.addTile = function (tile) {
 
   if (tile.mergedFrom) {
       wrapper.classList.add("tile-merged");
+      // 合体元のタイルを一時的に表示（アニメーション用）
       tile.mergedFrom.forEach(function (merged) {
-          const tempMergedTile = new Tile(merged.previousPosition || merged.position, merged.value);
-          self.addTile(tempMergedTile);
+          const tempWrapper = document.createElement("div");
+          const tempInner = document.createElement("div");
+          
+          const gridCellElement = document.querySelector('.grid-container .grid-cell');
+          const tileSize = gridCellElement ? gridCellElement.offsetWidth : 100;
+          const padding = 15;
+          const gap = 15;
+          
+          tempWrapper.style.width = tileSize + "px";
+          tempWrapper.style.height = tileSize + "px";
+          tempWrapper.style.left = ((merged.previousPosition || merged.position).x * (tileSize + gap) + padding) + "px";
+          tempWrapper.style.top = ((merged.previousPosition || merged.position).y * (tileSize + gap) + padding) + "px";
+          
+          const tempClasses = ["tile", "tile-" + merged.value];
+          if (merged.value > 2048) tempClasses.push("tile-super");
+          
+          self.applyClasses(tempWrapper, tempClasses);
+          tempInner.classList.add("tile-inner");
+          tempInner.textContent = merged.value;
+          tempWrapper.appendChild(tempInner);
+          
+          self.tileContainer.appendChild(tempWrapper);
+          
+          // 合体元タイルを短時間後に削除
+          setTimeout(function() {
+              if (tempWrapper.parentNode) {
+                  tempWrapper.parentNode.removeChild(tempWrapper);
+              }
+          }, 150);
       });
   }
 };
