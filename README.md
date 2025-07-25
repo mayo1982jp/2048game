@@ -1,4 +1,5 @@
 # 2048 Game
+<img width="525" height="736" alt="image" src="https://github.com/user-attachments/assets/b3987050-3bce-4058-89c0-552ff6d6101a" />
 
 This is a simple implementation of the 2048 game using HTML, CSS, and JavaScript.
 
